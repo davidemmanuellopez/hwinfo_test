@@ -2,3 +2,7 @@
 	path = deps/hwinfo
 	url = https://github.com/lfreist/hwinfo.git
 	branch = main
+[submodule "deps/nlohmann_json"]
+	path = deps/nlohmann_json
+	url = https://github.com/nlohmann/json.git
+	branch = master
