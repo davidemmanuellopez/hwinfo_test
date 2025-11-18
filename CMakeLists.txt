@@ -16,7 +16,9 @@ endif ()
 add_subdirectory(deps/hwinfo)
 
 add_executable(system_info system_infoMain.cpp)
-
+add_executable(custom_info system_info_in_struct.cpp)
 target_link_libraries(system_info PRIVATE lfreist-hwinfo::hwinfo fmt::fmt)
+target_link_libraries(custom_info PRIVATE lfreist-hwinfo::hwinfo fmt::fmt)
+
 
 install(TARGETS system_info)
