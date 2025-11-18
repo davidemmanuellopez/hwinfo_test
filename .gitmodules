@@ -1,0 +1,4 @@
+[submodule "deps/hwinfo"]
+	path = deps/hwinfo
+	url = https://github.com/lfreist/hwinfo.git
+	branch = main
