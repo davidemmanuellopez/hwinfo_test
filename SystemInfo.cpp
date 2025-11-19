@@ -17,7 +17,7 @@ json SystemInfo::get_info()
     json_["OS"]["architecture"] = os.is32bit() ? "32 bit" : "64 bit";
 
     //CPU section
-    uint cpu_i = 0;
+    unsigned int cpu_i = 0;
 
     for (const auto& cpu : cpus) {
         auto str_id = std::to_string(cpu_i);
@@ -28,7 +28,7 @@ json SystemInfo::get_info()
     }
 
     //Disk section
-    uint disk_i = 0;
+    unsigned int disk_i = 0;
     for (const auto& disk : disks) {
         auto str_id = std::to_string(disk_i);
         json_["Disks"][str_id]["vendor"] = disk.vendor();
