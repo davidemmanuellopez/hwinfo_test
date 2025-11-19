@@ -23,8 +23,9 @@ typedef struct _RawSMBIOSData
 }RawSMBIOSData;
 
 
-static void dmi_system_uuid(const BYTE *p, short ver)
+std::string dmi_system_uuid(const BYTE *p, short ver)
 {
+    char buff[200];
     int only0xFF = 1, only0x00 = 1;
     int i;
 
@@ -38,25 +39,28 @@ static void dmi_system_uuid(const BYTE *p, short ver)
 
     if (only0xFF)
     {
-        printf("Not Present");
+        sprintf(buff,"Not Present");
         return;
     }
 
     if (only0x00)
     {
-        printf("Not Settable");
+        printf(buff,"Not Settable");
         return;
     }
 
 
     if (ver >= 0x0206)
-        printf("%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X\n",
+        sprintf(buff,"%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X\n",
             p[3], p[2], p[1], p[0], p[5], p[4], p[7], p[6],
             p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
     else
-        printf("-%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X\n",
+        sprintf(buff,"-%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X\n",
             p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
             p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
+
+
+    return std::string(buff);
 }
 
 

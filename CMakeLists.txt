@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.2)
+cmake_minimum_required(VERSION 3.2)
 find_package(fmt QUIET)
 
 if (NOT fmt_FOUND)
