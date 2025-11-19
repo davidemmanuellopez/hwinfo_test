@@ -12,7 +12,6 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 
-
 #include <systemd/sd-device.h>
 
 // for convenience
@@ -31,10 +30,10 @@ private:
   hwinfo::OS os;
   std::vector<hwinfo::CPU> cpus;
   std::vector<hwinfo::Disk> disks;
-  std::string get_smbios_uuid();
-  std::string get_smbios_uuid_linux();
-
+  virtual std::string get_smbios_uuid() = 0;
 };
+
+
 
 json SystemInfo::get_info()
 {
@@ -76,21 +75,20 @@ json SystemInfo::get_info()
   return json_;
 }
 
-
-std::string SystemInfo::get_smbios_uuid()
+class LinuxSystemInfo : public SystemInfo
 {
-#ifdef _WIN32
-  char buff[200];
-  return std::string(get_smbios_uuid(buff,200));
-#elif __linux__
-  return get_smbios_uuid_linux();
-#endif
+public:
+  LinuxSystemInfo(): SystemInfo()
+  {
+
+  };
+private:
+  std::string get_smbios_uuid() override;
 
 };
 
-std::string SystemInfo::get_smbios_uuid_linux()
+std::string LinuxSystemInfo::get_smbios_uuid()
 {
-
   // NEED root!
   sd_device *dev = NULL;
   const char *uuid = NULL;
@@ -113,13 +111,32 @@ std::string SystemInfo::get_smbios_uuid_linux()
   return std::string(uuid);
 
   sd_device_unref(dev);
-  return 0;
+}
+
+class WindowsSystemInfo: public SystemInfo
+{
+public:
+  WindowsSystemInfo(): SystemInfo(){};
+private:
+  std::string get_smbios_uuid() override;
+};
+
+
+std::string WindowsSystemInfo::get_smbios_uuid()
+{
+  return std::string("Dummy");
 }
 
 
+#ifdef _WIN32
+using platformSystemInfo = WindowsSystemInfo;
+#elif __linux__
+using PlatformSystemInfo = LinuxSystemInfo;
+#endif
+
 int main(int argc, char** argv) {
 
-  auto system_info = SystemInfo();
+  auto system_info = PlatformSystemInfo();
   auto json_data = system_info.get_info();
 
   // Crear archivo y escribir JSON
