@@ -12,8 +12,9 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 
+#ifdef __linux__
 #include <systemd/sd-device.h>
-
+#endif
 // for convenience
 using json = nlohmann::json;
 
