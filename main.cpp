@@ -12,95 +12,9 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
 
+
 #include <systemd/sd-device.h>
 
-#ifdef _WIN32
-#include <Windows.h>
-#include <string.h>
-#include <tchar.h>
-#include <stdio.h>
-
-#include "system-uuid.h"
-
-
-typedef struct _dmi_header
-{
-  BYTE type;
-  BYTE length;
-  WORD handle;
-}dmi_header;
-
-
-typedef struct _RawSMBIOSData
-{
-  BYTE    Used20CallingMethod;
-  BYTE    SMBIOSMajorVersion;
-  BYTE    SMBIOSMinorVersion;
-  BYTE    DmiRevision;
-  DWORD   Length;
-  BYTE    SMBIOSTableData[];
-}RawSMBIOSData;
-
-
-
-static int format_system_uuid(const BYTE *p, int ver, char *buf, int size)
-{
-  if (ver >= 0x0206){
-    return snprintf(buf, size,
-                    "%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X",
-                    p[3], p[2], p[1], p[0], p[5], p[4], p[7], p[6],
-                    p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
-  }
-  else{
-    return snprintf(buf, size,
-                    "%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X",
-                    p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-                    p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15]);
-  }
-}
-
-
-char* get_system_uuid(char *out_buf, int size){
-  int bufsize = 0;
-  BYTE bios_buf[65536] = { 0 };
-  RawSMBIOSData *Smbios = (RawSMBIOSData *)bios_buf;
-
-  bufsize = GetSystemFirmwareTable('RSMB', 0, 0, 0);
-  if (!bufsize)
-  {
-    return NULL;
-  }
-  if(!GetSystemFirmwareTable('RSMB', 0, Smbios, bufsize)){
-    return NULL;
-  }
-  if (Smbios->Length != bufsize - 8)
-  {
-    return NULL;
-  }
-
-  BYTE *raw_smbios_ptr = (BYTE *)Smbios->SMBIOSTableData;
-
-  for (unsigned int i = 0; i < Smbios->Length; i++){
-    dmi_header *header_ptr = (dmi_header *)raw_smbios_ptr;
-
-    if (header_ptr->type == 1){
-      int formatted_len = format_system_uuid(raw_smbios_ptr + 0x8,
-                                             Smbios->SMBIOSMajorVersion * 0x100 + Smbios->SMBIOSMinorVersion,
-                                             out_buf,
-                                             size);
-      return out_buf;
-    }
-
-    raw_smbios_ptr += header_ptr->length;
-    while (*(WORD *)raw_smbios_ptr != 0){
-      raw_smbios_ptr++;
-    }
-    raw_smbios_ptr += 2;
-  }
-  return NULL;
-}
-
-#endif
 // for convenience
 using json = nlohmann::json;
 
@@ -130,7 +44,7 @@ json SystemInfo::get_info()
   // MainBoard section
   json_["mainboard"]["vendor"] = main_board.vendor();
   json_["mainboard"]["name"] = main_board.name();
-  json_["mainboard"]["smbios_uuid"] = get_smbios_uuid_linux();
+  json_["mainboard"]["smbios_uuid"] = get_smbios_uuid();
 
   // OS section
   json_["OS"]["name"] = os.name();
