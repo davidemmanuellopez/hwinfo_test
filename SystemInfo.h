@@ -2,8 +2,6 @@
 #ifndef SYSTEM_INFO
 #define SYSTEM_INFO
 
-#include <fmt/format.h>
-#include <fmt/ranges.h>
 #include <hwinfo/hwinfo.h>
 #include <hwinfo/utils/unit.h>
 
