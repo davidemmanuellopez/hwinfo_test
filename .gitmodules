@@ -6,3 +6,7 @@
 	path = deps/nlohmann_json
 	url = https://github.com/nlohmann/json.git
 	branch = master
+[submodule "deps/libudev-zero"]
+	path = deps/libudev-zero
+	url = https://github.com/illiliti/libudev-zero.git
+	branch = master
